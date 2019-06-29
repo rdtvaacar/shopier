@@ -1,0 +1,21 @@
+{
+  "name": "acr/ftr",
+  "description": "Faturalar",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "acr",
+      "email": "acarbey15@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Acr\\Shopier\\": "src/"
+    }
+  },
+  "require": {
+
+  }
+}
