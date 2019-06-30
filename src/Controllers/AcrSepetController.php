@@ -1,30 +1,40 @@
 <?php
 
-namespace Acr\Ftr\Controllers;
+namespace Acr\Shopier\Controllers;
 
-use Acr\Ftr\Model\Acr_user_table_conf;
-use Acr\Ftr\Model\AcrFtrAdress;
-use Acr\Ftr\Model\AcrUser;
-use Acr\Ftr\Model\Bank;
-use Acr\Ftr\Model\City;
-use Acr\Ftr\Model\Company_conf;
-use Acr\Ftr\Model\County;
-use Acr\Ftr\Model\Fatura;
-use Acr\Ftr\Model\Fatura_product;
-use Acr\Ftr\Model\Product;
-use Acr\Ftr\Model\Product_sepet;
-use Acr\Ftr\Model\Product_sepet_notes;
-use Acr\Ftr\Model\Promotion;
-use Acr\Ftr\Model\Promotion_user;
-use Acr\Ftr\Model\Sepet;
+use Acr\Shopier\Model\Acr_user_table_conf;
+use Acr\Shopier\Model\AcrFtrAdress;
+use Acr\Shopier\Model\AcrUser;
+use Acr\Shopier\Model\Bank;
+use Acr\Shopier\Model\City;
+use Acr\Shopier\Model\Company_conf;
+use Acr\Shopier\Model\County;
+use Acr\Shopier\Model\Fatura;
+use Acr\Shopier\Model\Fatura_product;
+use Acr\Shopier\Model\Product;
+use Acr\Shopier\Model\Product_sepet;
+use Acr\Shopier\Model\Product_sepet_notes;
+use Acr\Shopier\Model\Promotion;
+use Acr\Shopier\Model\Promotion_user;
+use Acr\Shopier\Model\Sepet;
 use AcrMenu;
 use App\Handlers\Commands\my;
 use App\Http\Controllers\MarketController;
 use Auth;
 use Redirect;
 use Session;
+use Shopier\Enums\ProductType;
+use Shopier\Exceptions\NotRendererClassException;
+use Shopier\Exceptions\RendererClassNotFoundException;
+use Shopier\Exceptions\RequiredParameterException;
+use Shopier\Models\Address;
+use Shopier\Models\Buyer;
+use Shopier\Renderers\AutoSubmitFormRenderer;
+use Shopier\Renderers\ButtonRenderer;
+use Shopier\Shopier;
 use Validator;
 use Illuminate\Http\Request;
+use App\User;
 
 class AcrSepetController extends Controller
 {
@@ -619,6 +629,7 @@ class AcrSepetController extends Controller
             $sepet_model->sepet_birle($session_id);
             $request->session()->forget('session_id');
         }
+
         $order_id = $request->input('order_id');
         $order_id = empty($order_id) ? $sepet_model->product_sepet_id() : $order_id;
         $sepet    = $sepet_model->where('id', $order_id)->with([
@@ -633,9 +644,33 @@ class AcrSepetController extends Controller
                 }
             }
         }
-        $sepet_nav   = self::sepet_nav($order_id, 2);
-        $adres_form  = self::adress_form($request);
-        $adresses    = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
+        $sepet_nav  = self::sepet_nav($order_id, 2);
+        $adres_form = self::adress_form($request);
+        $userModel  = new User();
+        $user       = $userModel->where('id', Auth::id())->with([
+            'company' => function ($q) {
+                $q->with(['city', 'county']);
+            }
+        ])->first();
+        $adresses   = $adress_model->where('user_id', Auth::user()->id)->where('sil', 0)->with('city', 'county')->get();
+        if (count($adresses) < 1) {
+            $postCode  = $user->company->city_id . $user->company->county_id;
+            $postCode  = $postCode == 0 || $postCode == '00' || empty($postCode) ? '34000' : $postCode;
+            $adresData = [
+                'user_id'      => $user->id,
+                'name'         => 'İş Adresi',
+                'city_id'      => $user->company->city_id,
+                'county_id'    => $user->company->county_id,
+                'invoice_name' => $user->name,
+                'adress'       => $user->company->name . ' ' . $user->company->adress,
+                'tc'           => empty($user->TC) ? '11111111111' : $user->TC,
+                'company'      => $user->company->name,
+                'post_code'    => $postCode,
+                'tel'          => $user->tel,
+            ];
+            $adress_model->insert($adresData);
+            return redirect()->to('/acr/ftr/card/adress');
+        }
         $order_link  = empty($order_id) ? '' : '?order_id=' . $order_id;
         $order_input = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
         self::ps_dis_rate_set($order_id); // product_sepet dis_rate oranlarını hesaplar
@@ -654,8 +689,123 @@ class AcrSepetController extends Controller
         }
     }
 
+    function apiSecret()
+    {
+        return 'b997956d989458063c624a7c7fe4fc13';
+    }
+
+    function shopierClass()
+    {
+        $apiKey    = 'caf343240136abe13bce62973b8aa27d';
+        $apiSecret = $this->apiSecret();
+        return new Shopier($apiKey, $apiSecret);
+    }
+
+    function shopierRenderButton($order)
+    {
+        $userModel  = new User();
+        $adresModel = new AcrFtrAdress();
+        $adress     = $adresModel->where('user_id', Auth::id())->where('active', 1)->with(['city', 'county'])->first();
+        $user       = $userModel->where('id', Auth::id())->first();
+        $shopier    = $this->shopierClass();
+
+        // Satın alan kişi bilgileri
+        $buyer = new Buyer([
+            'id'          => $user->id,
+            'name'        => $user->name,
+            'surname'     => $user->name,
+            'email'       => $user->email,
+            'phone'       => $user->tel,
+            'account_age' => date('Y') - date('Y', strtotime($user->created_at))
+        ]);
+        // Fatura ve kargo adresi birlikte tanımlama
+        // Ayrı ayrı da tanımlabilir
+        $address = new Address([
+            'address'  => $adress->adress,
+            'city'     => $adress->city->name,
+            'country'  => 'Turkey',
+            'postcode' => @$adress->post_code,
+        ]);
+
+        // shopier parametlerini al
+        $params = $shopier->getParams();
+
+        // Satın alan kişi bilgisini ekle
+        $params->setBuyer($buyer);
+
+        // Fatura ve kargo adresini aynı şekilde ekle
+        $params->setAddress($address);
+        $name = 'Site Aboneliği';
+        foreach ($order->products as $key => $product) {
+            $prices[] = $product->price;
+            $name     .= $product->product->name;
+            if (count($order->products) - 1 > $key) {
+                $name .= ',';
+            }
+        }
+        $price = round(array_sum($prices), 2);
+        // Sipariş numarsı ve sipariş tutarını ekle
+        $shopier->setOrderData($order->id, $price);
+        // Sipariş edilen ürünü ekle
+
+        $shopier->setProductData($name, ProductType::DOWNLOADABLE_VIRTUAL);
+
+        try {
+            /**
+             * Otomarik ödeme sayfasına yönlendiren renderer
+             *
+             * @var AutoSubmitFormRenderer $renderer
+             */
+            $renderer = $shopier->createRenderer(AutoSubmitFormRenderer::class);
+
+
+            /**
+             * Shopier İle Güvenli Öde şeklinde butona tıklanınca
+             * ödeme sayfasına yönlendirenn renderer
+             *
+             * @var ButtonRenderer $renderer
+             */
+            $renderer = $shopier->createRenderer(ButtonRenderer::class);
+            return $renderer->withStyle("padding:15px; color: #fff; background-color:#51cbb0; border:1px solid #fff; border-radius:7px")->withText('Kredi/Banka Kartı ile Satın Al');
+        } catch (RequiredParameterException $e) {
+            // Zorunlu parametlerden bir ve daha fazlası eksik
+
+            dd('Zorunlu parametlerden bir ve daha fazlası eksik' . $e);
+        } catch (NotRendererClassException $e) {
+            // $shopier->createRenderer(...) metodunda verilen class adı AbstracRenderer sınıfından türetilmemiş !
+            dd('metodunda verilen class adı AbstracRenderer sınıfından türetilmemiş !');
+        } catch (RendererClassNotFoundException $e) {
+            // $shopier->createRenderer(...) metodunda verilen class bulunamadı !
+            dd('metodunda verilen class bulunamadı !');
+        }
+        //return view('market.marketTest');
+    }
+
+    function order_result(Request $req)
+    {
+        $sepet_model = new Sepet();
+        # make request
+        $shopier = $this->shopierClass();
+        if (!empty($req->platform_order_id) && !empty($req->status) && !empty($req->installment) && !empty($req->payment_id) && !empty($req->random_nr) && !empty($req->signature)) {
+            $signature = base64_decode($req->signature);
+            $data      = $req->random_nr . $req->platform_order_id . $req->total_order_value . $req->currency;
+            $expected  = hash_hmac('SHA256', $data, $this->apiSecret(), true);
+            if (strcmp($signature, $expected) == 0) {
+                $sepet_id = $req->payment_id;
+                $siparis  = $sepet_model->where('id', $sepet_id)->first();
+                if ($siparis->siparis_onay != 1) {
+                    $sepet_model->where('id', $sepet_id)->update(['order_result' => 2]);
+                    $sepetController = new AcrSepetController();
+                    return $sepetController->orders_active($req, $sepet_id);
+                }
+            }
+        }
+    }
+
     function payment(Request $request)
     {
+
+        $shopier     = $this->shopierClass();
         $sepet_model = new Sepet();
         $bank_model  = new Bank();
         $order_id    = $request->input('order_id');
@@ -664,10 +814,20 @@ class AcrSepetController extends Controller
         $adress_id   = $request->input('adress');
         self::adres_secimi_api($request, $adress_id);
         $sepet_model->where('id', $order_id)->update(['adress_id' => $adress_id]);
-        $order_input = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
-        $banks       = $bank_model->where('active', 1)->where('sil', 0)->get();
-        $sepet_nav   = self::sepet_nav($order_id, 3);
-        return View('acr_shopier::card_payment', compact('sepet_nav', 'banks', 'order_link', 'order_input'));
+        $order_input    = empty($order_id) ? '' : '<input name="order_id" type="hidden" value="' . $order_id . '"/>';
+        $banks          = $bank_model->where('active', 1)->where('sil', 0)->get();
+        $sepet_nav      = self::sepet_nav($order_id, 3);
+        $order          = $sepet_model->where('id', $order_id)->with([
+            'products' => function ($q) {
+                $q->with([
+                    'product'
+                ]);
+            },
+        ])->first();
+        $bankCardButton = $this->shopierRenderButton($order);
+
+
+        return View('acr_shopier::card_payment', compact('sepet_nav', 'banks', 'order_link', 'bankCardButton', 'order_input', 'shopier'));
     }
 
     function adres_secimi_api(Request $request, $adress_id = null)
@@ -704,9 +864,9 @@ class AcrSepetController extends Controller
         $sepet_id = empty($sepet_id) ? $request->sepet_id : $sepet_id;
         $ps_model = new Product_sepet();
         $product  = $ps_model->where('id', $sepet_id)->with('product')->first();
-        $price         = self::price_set($product);
+        $price    = self::price_set($product);
         if ($product->id != 1282) {
-           return round($price,2);
+            return round($price, 2);
         }
         $not_dis_price = $product->product->price * $product->adet * $product->lisans_ay;
         $dis_rate      = self::dis_rate($not_dis_price, $price);
@@ -951,125 +1111,21 @@ class AcrSepetController extends Controller
     {
         $city_model = new City();
         $cities     = $city_model->get();
-        $row        = '<form method="post" action="/acr/ftr/card/adress/create">';
-        $row        .= csrf_field();
-        $row        .= '<div class="form-group">';
-        $row        .= '<label>Adres İsmi</label>';
-        $row        .= '<input required name="name" id="name" class="form-control" placeholder="Adres İsmi, Örn: Ev adresim, Kurum Adresim" value="' . @$adress->name . '">';
-        $row        .= '</div>';
-        $row        .= '<div class="form-group">';
-        $row        .= '<label>Alıcı İsmi (Ad Soyad şeklinde giriniz aksi halde sistem hata verir.)</label> ';
-        $row        .= '<input required name="invoice_name" id="invoice_name" class="form-control" placeholder="Adınız Soyadınız" value="' . @$adress->invoice_name . '">';
-        $row        .= '</div>';
-        $row        .= '<div class="form-group">';
-        $row        .= '<label>T.C. Kimlik No (11 Hane olmalıdır.) </label>';
-        $row        .= '<input  type="number" maxlength="11"  size="11" required name="tc" id="tc" class="form-control" placeholder="Kimlik Numaranızı " value="' . @$adress->tc . '">';
-        $row        .= '</div>';
-        // citys
-        $row .= '<div class="form-group">';
-        $row .= '<label>Şehir</label>';
-        $row .= '<select required name="city" id="city" class="form-control">';
-        $row .= '<option  value="">Şehir Seçiniz</option>';
-        foreach ($cities as $city) {
-            if ($city->id != 0) {
-                $select = $city->id == @$adress->city_id ? 'selected="selected"' : '';
-            } else {
-                $select = '';
-            }
-            $row .= '<option ' . $select . ' value="' . $city->id . '">';
-            $row .= $city->name;
-            $row .= '</option>';
-        }
-        $row .= '</select>';
-        $row .= '</div>';
-        $row .= '<div id="county">';
-        if (!empty($adress->city_id)) {
-            $row .= self::county_row($request, $adress->city_id, @$adress);
-        }
-        $row .= '</div>';
-        $row .= '<div class="form-group">';
-        $row .= '<label>Açık Adres</label>';
-        $row .= '<textarea required name="adress"  class="form-control" placeholder="Açık Adres">' . @$adress->adress . '</textarea>';
-        $row .= '</div>';
-        $row .= '<div class="form-group">';
-        $row .= '<label>Adres Posta Kodu</label>';
-        $row .= '<input required name="post_code" type="number" class="form-control" placeholder="Posta Kodu" value="' . @$adress->post_code . '">';
-        $row .= '</div>';
-        $row .= '<div class="form-group">';
-        $row .= '<label>Telefon</label>';
-        $row .= '<input required name="tel" type="number"  class="form-control" placeholder="Telefon" value="' . @$adress->tel . '">';
-        $row .= '</div>';
-        // kurumsal
-        if (@$adress->type == 1 || empty($adress->type)) {
-            $type_c_1 = 'checked';
-            $type_c_2 = '';
-        } else {
-            $type_c_1 = '';
-            $type_c_2 = 'checked';
-        }
-        $row .= '<div class="form-group">';
-        $row .= '<label class="type_b">';
-        $row .= '<input type="radio" name="type" value="1" class="flat-red" ' . $type_c_1 . '  style="position: absolute; opacity: 0;">';
-        $row .= '<div style="margin-left: 10px; font-size: 14pt; float: right;">Bireysel </div>';
-        $row .= '</label>';
-        $row .= '<label  style="margin-left: 30px;"  class="type_k">';
-        $row .= '<input  type="radio" name="type" value="2" class="flat-red" ' . $type_c_2 . ' style="position: absolute; opacity: 0;">';
-        $row .= '<div  style="margin-left: 10px; font-size: 14pt; float: right;">Kurumsal </div>';
-        $row .= '</label>';
-        $row .= '</div>';
-        // kurumsal fatura Bilgileri
-        $display = @$adress->type == 1 || empty(@$adress->type) ? 'none' : 'normal';
-        $row     .= '<div id="kurumsal" style="display: ' . $display . '">';
-        $row     .= '<div class="form-group">';
-        $row     .= '<label>Kurum İsmi</label>';
-        $row     .= '<input name="company"  class="form-control" placeholder="Kurum İsmi" value="' . @$adress->company . '">';
-        $row     .= '</div>';
-        $row     .= '<div class="form-group">';
-        $row     .= '<label>Kurum Vergi No</label>';
-        $row     .= '<input name="tax_number" type="number"  class="form-control" placeholder="Kurum Vergi No" value="' . @$adress->tax_number . '">';
-        $row     .= '</div>';
-        $row     .= '<div class="form-group">';
-        $row     .= '<label>Kurum Vergi Dairesi</label>';
-        $row     .= '<input name="tax_office"  class="form-control" placeholder="Kurum Vergi Dairesi" value="' . @$adress->tax_office . '">';
-        $row     .= '</div>';
-        // e fatura
-        if (@$adress->e_fatura == 2) {
-            $e_fatura_check = 'checked';
-        } else {
-            $e_fatura_check = '';
-        }
-        $row .= '<label for="e_fatura" class="">';
-        $row .= '<input name="e_fatura" id="e_fatura" type="checkbox" ' . $e_fatura_check . ' class="minimal-red" value="2"  style="position: absolute; opacity: 0;">';
-        $row .= '<div style="margin-left: 10px; font-size: 14pt; float: right;">E-Fatura Mükellefiyim</div>';
-        $row .= '</label>';
-        $row .= '</div>';
-        $row .= '<input type="hidden" name="adress_id"  value="' . @$adress->id . '">';
-        $row .= '<input type="hidden" name="user_id"  value="' . @$user_id . '">';
-        $row .= '<button type="submit" class="btn btn-primary">ADRES KAYDET <span class="fa fa-angle-double-right"></span> </button>';
-        $row .= '</form>';
-        $row .= '<div style="clear:both;"></div>';
+        $county_row = $this->county_row($request, $adress);
+        $row        = view('acr_shopier::adress_form', compact('cities', 'county_row', 'adress'))->render();
         return $row;
     }
 
-    function county_row(Request $request, $city_id = null, $adress = null)
+    function county_row(Request $request, $adress = null)
     {
         $county_model = new County();
+        $city_id      = @$adress->city_id;
         if (empty($city_id)) {
             $city_id = $request->input('city_id');
         }
         $counties = $county_model->where('city_id', $city_id)->get();
         // citys
-        $row = '<div class="form-group">';
-        $row .= '<label>İlçe</label>';
-        $row .= '<select required name="county" class="form-control">';
-        foreach ($counties as $county) {
-            $select = $county->id == @$adress->county_id ? 'selected="selected"' : '';
-            $row    .= '<option ' . $select . ' value="' . $county->id . '">';
-            $row    .= $county->name;
-            $row    .= '</option>';
-        }
-        $row .= '</select>';
-        $row .= '</div>';
+        $row = view('acr_shopier::county_row', compact('counties', 'adress'))->render();
 
         return $row;
     }

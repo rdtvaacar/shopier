@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -32,22 +32,22 @@ class AcrUser extends Authenticatable
 
     function products()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product', 'user_id');
+        return $this->hasMany('Acr\Shopier\Model\Product', 'user_id');
     }
 
     function sepet()
     {
-        return $this->hasOne('Acr\Ftr\Model\Sepet', 'user_id');
+        return $this->hasOne('Acr\Shopier\Model\Sepet', 'user_id');
     }
 
     function roles()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\AcrRole', 'role_user', 'user_id', 'role_id');
+        return $this->belongsToMany('Acr\Shopier\Model\AcrRole', 'role_user', 'user_id', 'role_id');
     }
 
     function adresses()
     {
-        return $this->hasMany('Acr\Ftr\Model\AcrMenuAdress', 'user_id');
+        return $this->hasMany('Acr\Shopier\Model\AcrMenuAdress', 'user_id');
     }
 
 }

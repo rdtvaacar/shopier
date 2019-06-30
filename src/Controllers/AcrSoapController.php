@@ -1,9 +1,9 @@
 <?php
 
-namespace Acr\Ftr\Controllers;
+namespace Acr\Shopier\Controllers;
 
 use Artisaninweb\SoapWrapper\SoapWrapper;
-use Acr\Ftr\Controllers\Fit\Entity\UserListsRequest;
+use Acr\Shopier\Controllers\Fit\Entity\UserListsRequest;
 
 class AcrSoapController
 {

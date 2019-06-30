@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +13,6 @@ class Promotion_product extends Model
 
     function product()
     {
-        return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
+        return $this->hasOne('Acr\Shopier\Model\Product', 'id', 'product_id');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Auth;
 use DB;
@@ -88,12 +88,12 @@ class Sepet extends Model
 
     function Acrproducts()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\Acrproduct', 'product_sepet', 'sepet_id')->withPivot('adet', 'lisans_ay');
+        return $this->belongsToMany('Acr\Shopier\Model\Acrproduct', 'product_sepet', 'sepet_id')->withPivot('adet', 'lisans_ay');
     }
 
     function products()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_sepet', 'sepet_id', 'id');
+        return $this->hasMany('Acr\Shopier\Model\Product_sepet', 'sepet_id', 'id');
     }
 
     function delete()
@@ -103,12 +103,12 @@ class Sepet extends Model
 
     function note()
     {
-        return $this->hasOne('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');
+        return $this->hasOne('Acr\Shopier\Model\Product_sepet_notes', 'sepet_id', 'sepet_id');
     }
 
     function notes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'sepet_id', 'id');
+        return $this->hasMany('Acr\Shopier\Model\Product_sepet_notes', 'sepet_id', 'id');
     }
 
     function sepet_birle($session_id)
@@ -174,6 +174,6 @@ class Sepet extends Model
 
     function adress()
     {
-        return $this->hasOne('Acr\Ftr\Model\AcrFtrAdress', 'user_id', 'user_id');
+        return $this->hasOne('Acr\Shopier\Model\AcrFtrAdress', 'user_id', 'user_id');
     }
 }

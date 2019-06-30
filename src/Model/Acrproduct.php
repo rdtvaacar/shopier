@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Auth;
@@ -17,12 +17,12 @@ class Acrproduct extends Model
      */
     function attributes()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrAttribute', 'attribute_product', 'product_id', 'attribute_id');
+        return $this->belongsToMany('Acr\Shopier\Model\AcrFtrAttribute', 'attribute_product', 'product_id', 'attribute_id');
     }
 
     function product()
     {
-        return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
+        return $this->hasOne('Acr\Shopier\Model\Product', 'id', 'product_id');
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +12,6 @@ class User_product extends Model
     protected $table      = 'user_product';
     function user()
     {
-        return $this->hasOne('Acr\Ftr\Model\Eticaret_user','id','user_id');
+        return $this->hasOne('Acr\Shopier\Model\Eticaret_user','id','user_id');
     }
 }

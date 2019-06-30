@@ -1,9 +1,9 @@
-@extends('acr_ftr.index')
+@extends('acr_shopier.index')
 @section('header')
     <link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
     <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
 @stop
-@section('acr_ftr')
+@section('acr_shopier')
     <section class="content">
         <div class="row">
             <div class=" col-md-12">

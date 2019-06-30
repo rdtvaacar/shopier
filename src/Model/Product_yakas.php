@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +19,7 @@ class Product_yakas extends Model
 
     function yaka()
     {
-        return $this->belongsTo('Acr\Ftr\Model\Yakas');
+        return $this->belongsTo('Acr\Shopier\Model\Yakas');
     }
 
 }

@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Acr\Ftr\Controllers\Parasut;
+namespace Acr\Shopier\Controllers\Parasut;
 
-use Acr\Ftr\Controllers\Parasut\Exception\NotFoundException;
-use Acr\Ftr\Controllers\Parasut\Exception\UnauthorizedException;
-use Acr\Ftr\Controllers\Parasut\Exception\UnprocessableEntityException;
-use Acr\Ftr\Controllers\Parasut\Exception\InternalServerErrorException;
+use Acr\Shopier\Controllers\Parasut\Exception\NotFoundException;
+use Acr\Shopier\Controllers\Parasut\Exception\UnauthorizedException;
+use Acr\Shopier\Controllers\Parasut\Exception\UnprocessableEntityException;
+use Acr\Shopier\Controllers\Parasut\Exception\InternalServerErrorException;
 
 /**
  * Client

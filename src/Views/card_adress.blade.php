@@ -1,9 +1,9 @@
-@extends('acr_ftr.index')
+@extends('acr_shopier.index')
 @section('header')
-    <link rel="stylesheet" href="/css/acr_ftr/sepet.css">
+    <link rel="stylesheet" href="/css/acr_shopier/sepet.css">
     <link rel="stylesheet" href="/plugins/iCheck/all.css">
 @stop
-@section('acr_ftr')
+@section('acr_shopier')
     <section class="content">
         <div class="row">
             <div class=" col-md-12">
@@ -43,8 +43,8 @@
                                                    value="<?php echo $adress->id ?>" class="flat-red"
                                                    <?php echo $checked ?> style="position: absolute; opacity: 0;"></div>
                                         <div style="float: left; width: 90%; margin-left: 20px;">
-                                            <div style="font-size: 14pt; ">{{ $adress->name}}- <span
-                                                        style="font-weight: 200;">{{$adress->county->name . '/' . $adress->city->name }}</span>
+                                            <div style="font-size: 14pt; ">{{ @$adress->name}}- <span
+                                                        style="font-weight: 200;">{{@$adress->county->name . '/' . @$adress->city->name }}</span>
                                             </div>
                                         </div>
                                     </label>
@@ -97,7 +97,6 @@
         <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
-
 @stop
 @section('footer')
     <script src="/plugins/iCheck/icheck.min.js"></script>
@@ -152,7 +151,5 @@
                 });
             }
         }
-
-
     </script>
 @stop

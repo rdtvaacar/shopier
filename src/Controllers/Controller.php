@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Controllers;
+namespace Acr\Shopier\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
 use Auth;

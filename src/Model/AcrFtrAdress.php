@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Auth;
@@ -26,12 +26,12 @@ class AcrFtrAdress extends Model
 
     function city()
     {
-        return $this->belongsTo('Acr\Ftr\Model\City', 'city_id', 'id');
+        return $this->belongsTo('Acr\Shopier\Model\City', 'city_id', 'id');
     }
 
     function county()
     {
-        return $this->belongsTo('Acr\Ftr\Model\County', 'county_id', 'id');
+        return $this->belongsTo('Acr\Shopier\Model\County', 'county_id', 'id');
     }
 
     function active_adress($adress_id)

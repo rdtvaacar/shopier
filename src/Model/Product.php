@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Auth;
@@ -19,53 +19,53 @@ class Product extends Model
 
     function attributes()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\AcrFtrAttribute', 'attribute_product', 'product_id', 'attribute_id');
+        return $this->belongsToMany('Acr\Shopier\Model\AcrFtrAttribute', 'attribute_product', 'product_id', 'attribute_id');
     }
 
     function u_kats()
     {
-        return $this->belongsToMany('Acr\Ftr\Model\U_kat');
+        return $this->belongsToMany('Acr\Shopier\Model\U_kat');
     }
 
     function my_product()
     {
-        return $this->hasOne('Acr\Ftr\Model\Acrproduct');
+        return $this->hasOne('Acr\Shopier\Model\Acrproduct');
     }
 
     function files()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_file', 'acr_file_id', 'acr_file_id');
+        return $this->hasMany('Acr\Shopier\Model\Product_file', 'acr_file_id', 'acr_file_id');
 
     }
 
     function file()
     {
-        return $this->hasOne('Acr\Ftr\Model\Product_file', 'acr_file_id', 'acr_file_id');
+        return $this->hasOne('Acr\Shopier\Model\Product_file', 'acr_file_id', 'acr_file_id');
 
     }
 
     function product_kols()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_kols');
+        return $this->hasMany('Acr\Shopier\Model\Product_kols');
     }
 
     function product_yakas()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_yakas');
+        return $this->hasMany('Acr\Shopier\Model\Product_yakas');
     }
 
     function product_sizes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_sizes');
+        return $this->hasMany('Acr\Shopier\Model\Product_sizes');
     }
 
     function product_notes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_note');
+        return $this->hasMany('Acr\Shopier\Model\Product_note');
     }
 
     function user_product()
     {
-        return $this->hasOne('Acr\Ftr\Model\User_product');
+        return $this->hasOne('Acr\Shopier\Model\User_product');
     }
 }

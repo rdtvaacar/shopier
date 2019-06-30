@@ -1,5 +1,5 @@
-@extends('acr_ftr.index')
-@section('acr_ftr')
+@extends('acr_shopier.index')
+@section('acr_shopier')
     <section class="content">
         <div class="row">
             {!! $msg !!}

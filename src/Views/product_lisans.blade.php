@@ -1,4 +1,4 @@
-@extends('acr_ftr.index')
+@extends('acr_shopier.index')
 @section('header')
     <style>
         .urun_sec {
@@ -21,7 +21,7 @@
         }
     </style>
 @stop
-@section('acr_ftr')
+@section('acr_shopier')
     <div class="col-md-3">
         <div class="box box-primary">
             <div class="box-header with-border">

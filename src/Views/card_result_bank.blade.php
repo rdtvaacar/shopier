@@ -1,9 +1,9 @@
-@extends('acr_ftr.index')
+@extends('acr_shopier.index')
 @section('header')
-    <link rel="stylesheet" href="/css/acr_ftr/sepet.css">
+    <link rel="stylesheet" href="/css/acr_shopier/sepet.css">
     <link rel="stylesheet" href="/plugins/iCheck/all.css">
 @stop
-@section('acr_ftr')
+@section('acr_shopier')
     <section class="invoice">
         <!-- title row -->
         <div class="row">

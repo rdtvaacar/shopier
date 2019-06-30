@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Auth;
@@ -20,11 +20,11 @@ class Fatura extends Model
 
     function user()
     {
-        return $this->belongsTo('Acr\Ftr\Model\AcrUser');
+        return $this->belongsTo('Acr\Shopier\Model\AcrUser');
     }
 
     function products()
     {
-        return $this->hasMany('Acr\Ftr\Model\Fatura_product', 'order_id', 'order_id');
+        return $this->hasMany('Acr\Shopier\Model\Fatura_product', 'order_id', 'order_id');
     }
 }

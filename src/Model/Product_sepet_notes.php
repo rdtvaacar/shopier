@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +18,7 @@ class Product_sepet_notes extends Model
 
     function note()
     {
-        return $this->belongsTo('Acr\Ftr\Model\Product_note');
+        return $this->belongsTo('Acr\Shopier\Model\Product_note');
     }
 
 }

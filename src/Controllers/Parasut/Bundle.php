@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Acr\Ftr\Controllers\Parasut;
+namespace Acr\Shopier\Controllers\Parasut;
 
 /**
  * Bundle

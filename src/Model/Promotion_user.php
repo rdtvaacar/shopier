@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,7 @@ class Promotion_user extends Model
 
     function ps()
     {
-        return $this->hasOne('Acr\Ftr\Model\Product_sepet', 'id', 'ps_id');
+        return $this->hasOne('Acr\Shopier\Model\Product_sepet', 'id', 'ps_id');
     }
 
     function promosyon($ps, $user_id)
@@ -68,7 +68,7 @@ class Promotion_user extends Model
 
     function pr_products()
     {
-        return $this->hasMany('Acr\Ftr\Model\Promotion_product', 'promotion_id', 'id');
+        return $this->hasMany('Acr\Shopier\Model\Promotion_product', 'promotion_id', 'id');
     }
 
     function user()
@@ -78,7 +78,7 @@ class Promotion_user extends Model
 
     function promotion()
     {
-        return $this->hasOne('Acr\Ftr\Model\Promotion', 'id', 'promotion_id');
+        return $this->hasOne('Acr\Shopier\Model\Promotion', 'id', 'promotion_id');
     }
 
 }

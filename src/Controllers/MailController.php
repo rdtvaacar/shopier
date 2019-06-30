@@ -1,8 +1,8 @@
 <?php
 
-namespace Acr\Ftr\Controllers;
+namespace Acr\Shopier\Controllers;
 
-use Acr\Ftr\Model\AcrUser;
+use Acr\Shopier\Model\AcrUser;
 use Mail;
 use Auth;
 use View;

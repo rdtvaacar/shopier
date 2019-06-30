@@ -1,4 +1,4 @@
-@extends('acr_ftr.index')
+@extends('acr_shopier.index')
 @section('title')
     <title>{{$product->product_name}}</title>
 @stop
@@ -241,7 +241,7 @@
     </style>
     <link rel="stylesheet" href="/blueimp/css/blueimp-gallery.min.css">
 @stop
-@section('acr_ftr')
+@section('acr_shopier')
     <section class="content">
         <div class="row">
             {!! $msg !!}

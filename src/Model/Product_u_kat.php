@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,11 +11,11 @@ class Product_u_kat extends Model
 
     public function u_kat()
     {
-        return $this->hasOne('Acr\Ftr\Model\U_kat', 'id', 'u_kat_id');
+        return $this->hasOne('Acr\Shopier\Model\U_kat', 'id', 'u_kat_id');
     }
 
     function product()
     {
-        return $this->belongsTo('Acr\Ftr\Model\Product', 'id', 'product_id');
+        return $this->belongsTo('Acr\Shopier\Model\Product', 'id', 'product_id');
     }
 }

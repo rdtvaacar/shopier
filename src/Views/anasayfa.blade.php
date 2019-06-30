@@ -1,4 +1,4 @@
-@extends('acr_ftr.index')
-@section('acr_ftr')
+@extends('acr_shopier.index')
+@section('acr_shopier')
    
 @stop

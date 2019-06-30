@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +11,7 @@ class AcrFtrAttribute extends Model
 
     function attributes()
     {
-        return $this->hasMany('Acr\Ftr\Model\AcrFtrAttribute', 'attribute_id', 'id');
+        return $this->hasMany('Acr\Shopier\Model\AcrFtrAttribute', 'attribute_id', 'id');
     }
 
     function attribute_create($att_id, $data)

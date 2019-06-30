@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +19,7 @@ class Product_kols extends Model
 
     function kol()
     {
-        return $this->belongsTo('Acr\Ftr\Model\Kols');
+        return $this->belongsTo('Acr\Shopier\Model\Kols');
     }
 
 }

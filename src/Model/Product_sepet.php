@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Model;
+namespace Acr\Shopier\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Auth;
@@ -19,17 +19,17 @@ class Product_sepet extends Model
      */
     function product()
     {
-        return $this->hasOne('Acr\Ftr\Model\Product', 'id', 'product_id');
+        return $this->hasOne('Acr\Shopier\Model\Product', 'id', 'product_id');
     }
 
     function acr_product()
     {
-        return $this->hasOne('Acr\Ftr\Model\Acrproduct', 'product_id', 'product_id');
+        return $this->hasOne('Acr\Shopier\Model\Acrproduct', 'product_id', 'product_id');
     }
 
     function sepet()
     {
-        return $this->hasOne('Acr\Ftr\Model\Sepet', 'id', 'sepet_id');
+        return $this->hasOne('Acr\Shopier\Model\Sepet', 'id', 'sepet_id');
     }
 
     function use_plus($product_id, $sepet_id, $data = null, $data_notes = null)
@@ -48,26 +48,26 @@ class Product_sepet extends Model
 
     function product_notes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_note', 'product_id');
+        return $this->hasMany('Acr\Shopier\Model\Product_note', 'product_id');
     }
 
     function size()
     {
-        return $this->belongsTo('Acr\Ftr\Model\Sizes');
+        return $this->belongsTo('Acr\Shopier\Model\Sizes');
     }
 
     function yaka()
     {
-        return $this->belongsTo('Acr\Ftr\Model\Yakas');
+        return $this->belongsTo('Acr\Shopier\Model\Yakas');
     }
 
     function kol()
     {
-        return $this->belongsTo('Acr\Ftr\Model\Kols');
+        return $this->belongsTo('Acr\Shopier\Model\Kols');
     }
 
     function notes()
     {
-        return $this->hasMany('Acr\Ftr\Model\Product_sepet_notes', 'product_id', 'product_id');
+        return $this->hasMany('Acr\Shopier\Model\Product_sepet_notes', 'product_id', 'product_id');
     }
 }

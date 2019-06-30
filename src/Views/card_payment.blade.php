@@ -1,9 +1,9 @@
-@extends('acr_ftr.index')
+@extends('acr_shopier.index')
 @section('header')
-    <link rel="stylesheet" href="/css/acr_ftr/sepet.css">
+    <link rel="stylesheet" href="/css/acr_shopier/sepet.css">
     <link rel="stylesheet" href="/plugins/iCheck/all.css">
 @stop
-@section('acr_ftr')
+@section('acr_shopier')
     <section class="content">
         <div class="row">
             <div class=" col-md-12">
@@ -43,7 +43,7 @@
                             </div>
                             <!-- /.tab-pane -->
                             <div style="text-align: center;" class="tab-pane active" id="kredi_karti">
-                                <a href="/acr/ftr/card/payment/bank_card<?php echo $order_link?>"><img src="/img/simdiAl.png"/> </a>
+                                {!!     $shopier->goWith($bankCardButton); !!}
                             </div>
                             <!-- /.tab-pane -->
 
@@ -86,33 +86,35 @@
     <script>
         $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
             checkboxClass: 'icheckbox_minimal-blue',
-            radioClass   : 'iradio_minimal-blue'
+            radioClass: 'iradio_minimal-blue'
         });
         //Red color scheme for iCheck
         $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
             checkboxClass: 'icheckbox_minimal-red',
-            radioClass   : 'iradio_minimal-red'
+            radioClass: 'iradio_minimal-red'
         });
         //Flat red color scheme for iCheck
         $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
             checkboxClass: 'icheckbox_flat-green',
-            radioClass   : 'iradio_flat-green'
+            radioClass: 'iradio_flat-green'
         });
 
         $('#city').change(function () {
             city_id = $(this).val();
             county_get(city_id);
         });
+
         function county_get(city_id) {
             $.ajax({
-                type   : 'post',
-                url    : '/acr/ftr/card/adress/county',
-                data   : 'city_id=' + city_id,
+                type: 'post',
+                url: '/acr/ftr/card/adress/county',
+                data: 'city_id=' + city_id,
                 success: function (veri) {
                     $('#county').html(veri);
                 }
             });
         }
+
         $('.type_b').on('ifChecked', function (event) {
             $('#kurumsal').hide();
         });

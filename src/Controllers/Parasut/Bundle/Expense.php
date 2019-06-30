@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Acr\Ftr\Controllers\Parasut\Bundle;
+namespace Acr\Shopier\Controllers\Parasut\Bundle;
 
-use Acr\Ftr\Controllers\Parasut\Bundle;
+use Acr\Shopier\Controllers\Parasut\Bundle;
 
 /**
  * Expense

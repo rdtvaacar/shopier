@@ -1,9 +1,9 @@
 <?php
 
-namespace Acr\Ftr\Controllers;
+namespace Acr\Shopier\Controllers;
 
-use Acr\Ftr\Controllers\Parasut\Client;
-use Acr\Ftr\Model\Parasut_conf;
+use Acr\Shopier\Controllers\Parasut\Client;
+use Acr\Shopier\Model\Parasut_conf;
 use Illuminate\Http\Request;
 
 class ParasutController

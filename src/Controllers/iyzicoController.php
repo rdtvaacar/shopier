@@ -1,11 +1,11 @@
 <?php
 
-namespace Acr\Ftr\Controllers;
+namespace Acr\Shopier\Controllers;
 
-use Acr\Ftr\Model\Acr_user_table_conf;
-use Acr\Ftr\Model\AcrFtrAdress;
-use Acr\Ftr\Model\AcrFtrIyzico;
-use Acr\Ftr\Model\Sepet;
+use Acr\Shopier\Model\Acr_user_table_conf;
+use Acr\Shopier\Model\AcrFtrAdress;
+use Acr\Shopier\Model\AcrFtrIyzico;
+use Acr\Shopier\Model\Sepet;
 use App\Siparis;
 use Auth;
 use DB;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Acr\Ftr\Facades;
+namespace Acr\Shopier\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

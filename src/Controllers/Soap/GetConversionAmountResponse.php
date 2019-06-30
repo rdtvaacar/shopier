@@ -1,5 +1,5 @@
 <?php
-namespace Acr\Ftr\Controllers\Soap;
+namespace Acr\Shopier\Controllers\Soap;
 
 class GetConversionAmountResponse
 {
