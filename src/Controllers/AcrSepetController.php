@@ -4,6 +4,7 @@ namespace Acr\Shopier\Controllers;
 
 use Acr\Shopier\Model\Acr_user_table_conf;
 use Acr\Shopier\Model\AcrFtrAdress;
+use Acr\Shopier\Model\AcrFtrIyzico;
 use Acr\Shopier\Model\AcrUser;
 use Acr\Shopier\Model\Bank;
 use Acr\Shopier\Model\City;
@@ -185,16 +186,22 @@ class AcrSepetController extends Controller
     function indirim()
     {
         $promotion_user_model = new Promotion_user();
-        $promotion_users      = $promotion_user_model->where('user_id', @Auth::user()->id)->with([
+        $created_at           = date('Y-m-d', strtotime("+1 years"));
+        $promotion_users      = $promotion_user_model->where('user_id', @Auth::user()->id)->whereDate('created_at', '>', $created_at)->with([
             'promotion' => function ($q) {
                 $q->with([
                     'pr_products' => function ($q) {
                         $q->with('product');
+                        $q->whereDate('created_at', '>', $created_at);
+
                     }
                 ]);
+                $q->whereDate('created_at', '>', $created_at);
             },
             'ps'        => function ($q) {
                 $q->with('product');
+                $q->whereDate('created_at', '>', $created_at);
+
             },
         ])->get();
         $promo_user_ids       = [];
@@ -691,24 +698,28 @@ class AcrSepetController extends Controller
 
     function apiSecret()
     {
-        return 'b997956d989458063c624a7c7fe4fc13';
+        $iyzi_model = new AcrFtrIyzico();
+        $iyzico     = $iyzi_model->first();
+        return $iyzico->setSecretKey;
     }
 
     function shopierClass()
     {
-        $apiKey    = 'caf343240136abe13bce62973b8aa27d';
-        $apiSecret = $this->apiSecret();
-        return new Shopier($apiKey, $apiSecret);
+        $iyzi_model = new AcrFtrIyzico();
+        $iyzico     = $iyzi_model->first();
+        $apiSecret  = $this->apiSecret();
+        return new Shopier($iyzico->setApiKey, $apiSecret);
     }
 
     function shopierRenderButton($order)
     {
         $userModel  = new User();
         $adresModel = new AcrFtrAdress();
+        $sepetModel = new Sepet();
+        $request    = new Request();
         $adress     = $adresModel->where('user_id', Auth::id())->where('active', 1)->with(['city', 'county'])->first();
         $user       = $userModel->where('id', Auth::id())->first();
         $shopier    = $this->shopierClass();
-
         // Satın alan kişi bilgileri
         $buyer = new Buyer([
             'id'          => $user->id,
@@ -716,7 +727,9 @@ class AcrSepetController extends Controller
             'surname'     => $user->name,
             'email'       => $user->email,
             'phone'       => $user->tel,
-            'account_age' => date('Y') - date('Y', strtotime($user->created_at))
+            'account_age' => date('Y') - date('Y', strtotime($user->created_at)),
+
+
         ]);
         // Fatura ve kargo adresi birlikte tanımlama
         // Ayrı ayrı da tanımlabilir
@@ -725,6 +738,7 @@ class AcrSepetController extends Controller
             'city'     => $adress->city->name,
             'country'  => 'Turkey',
             'postcode' => @$adress->post_code,
+            'cargo'    => 1
         ]);
 
         // shopier parametlerini al
@@ -736,20 +750,29 @@ class AcrSepetController extends Controller
         // Fatura ve kargo adresini aynı şekilde ekle
         $params->setAddress($address);
         $name = 'Site Aboneliği';
+
+
         foreach ($order->products as $key => $product) {
-            $prices[] = $product->price;
-            $name     .= $product->product->name;
+            if ($product->id != 1282) {
+                $prices[] = round(self::price_set($product), 2);
+            } else {
+                $prices[] = $product->price;
+            }
+            $name .= $product->product->name;
             if (count($order->products) - 1 > $key) {
                 $name .= ',';
             }
         }
+        //$fiyat_data = $this->lisans_urun_fiyat_hesapla($order->adet, $order->lisans_ay,$order->product_id );
         $price = round(array_sum($prices), 2);
+        $sepetModel->where('user_id', $user->id)->where('id', $order->id)->update(['price' => $price]);
+
+
         // Sipariş numarsı ve sipariş tutarını ekle
         $shopier->setOrderData($order->id, $price);
         // Sipariş edilen ürünü ekle
 
-        $shopier->setProductData($name, ProductType::DOWNLOADABLE_VIRTUAL);
-
+        $shopier->setProductData($name, 'dijital');
         try {
             /**
              * Otomarik ödeme sayfasına yönlendiren renderer
@@ -757,8 +780,6 @@ class AcrSepetController extends Controller
              * @var AutoSubmitFormRenderer $renderer
              */
             $renderer = $shopier->createRenderer(AutoSubmitFormRenderer::class);
-
-
             /**
              * Shopier İle Güvenli Öde şeklinde butona tıklanınca
              * ödeme sayfasına yönlendirenn renderer
@@ -785,16 +806,23 @@ class AcrSepetController extends Controller
     {
         $sepet_model = new Sepet();
         # make request
-        $shopier = $this->shopierClass();
-        if (!empty($req->platform_order_id) && !empty($req->status) && !empty($req->installment) && !empty($req->payment_id) && !empty($req->random_nr) && !empty($req->signature)) {
-            $signature = base64_decode($req->signature);
-            $data      = $req->random_nr . $req->platform_order_id . $req->total_order_value . $req->currency;
-            $expected  = hash_hmac('SHA256', $data, $this->apiSecret(), true);
-            if (strcmp($signature, $expected) == 0) {
-                $sepet_id = $req->payment_id;
+        $shopier                = $this->shopierClass();
+        $response_data          = [
+            'platform_order_id' => $req->platform_order_id,
+            'status'            => $req->status,
+            'installment'       => $req->installment,
+            'payment_id'        => $req->payment_id,
+            'random_nr'         => $req->random_nr,
+            'signature'         => $req->signature
+
+        ];
+        $isValidPaymentResponse = $shopier->verifyResponse($response_data);
+        if ($isValidPaymentResponse) {
+            if ($req->status == 'success') {
+                $sepet_id = $req->platform_order_id;
                 $siparis  = $sepet_model->where('id', $sepet_id)->first();
                 if ($siparis->siparis_onay != 1) {
-                    $sepet_model->where('id', $sepet_id)->update(['order_result' => 2]);
+                    $sepet_model->where('id', $sepet_id)->update(['order_result' => 2, 'siparis' => 1]);
                     $sepetController = new AcrSepetController();
                     return $sepetController->orders_active($req, $sepet_id);
                 }
@@ -804,7 +832,6 @@ class AcrSepetController extends Controller
 
     function payment(Request $request)
     {
-
         $shopier     = $this->shopierClass();
         $sepet_model = new Sepet();
         $bank_model  = new Bank();
@@ -1279,8 +1306,8 @@ class AcrSepetController extends Controller
             'tax_number'                => $tax_number,
             'tax_office'                => $adress_row->office,
             'category_id'               => null,
-            'city'                      => $adress_row->city->name,
-            'district'                  => $adress_row->county->name,
+            'city'                      => @$adress_row->city->name,
+            'district'                  => @$adress_row->county->name,
             'email'                     => Auth::user()->$user_email,
             'address_attributes'        => [
                 'address' => $adress_row->adress,
@@ -1649,13 +1676,13 @@ class AcrSepetController extends Controller
                 $view .= 'Şehir';
                 $view .= '</td>';
                 $view .= '<td>';
-                $view .= $sepet_row->adress->city->name;
+                $view .= @$sepet_row->adress->city->name;
                 $view .= '</td>';
                 $view .= '<td>';
                 $view .= 'İlçe';
                 $view .= '</td>';
                 $view .= '<td>';
-                $view .= $sepet_row->adress->county->name;
+                $view .= @$sepet_row->adress->county->name;
                 $view .= '</td>';
                 $view .= '</tr>';
 
