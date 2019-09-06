@@ -6,7 +6,7 @@ use Acr\Shopier\Controllers\AcrFtrController;
 use Acr\Shopier\Controllers\AcrShopierController;
 use Illuminate\Support\ServiceProvider;
 
-class AcrFtrServiceProviders extends ServiceProvider
+class AcrShopierServiceProviders extends ServiceProvider
 {
     public function boot()
     {

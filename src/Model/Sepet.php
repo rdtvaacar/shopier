@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 
 class Sepet extends Model
-
 {
     protected $connection = 'mysql';
 

@@ -738,7 +738,6 @@ class AcrSepetController extends Controller
             'city'     => $adress->city->name,
             'country'  => 'Turkey',
             'postcode' => @$adress->post_code,
-            'cargo'    => 1
         ]);
 
         // shopier parametlerini al
@@ -751,7 +750,8 @@ class AcrSepetController extends Controller
         $params->setAddress($address);
         $name = 'Site Aboneliği';
 
-
+        $product_type = 1;
+        $cargo        = 0;
         foreach ($order->products as $key => $product) {
             if ($product->id != 1282) {
                 $prices[] = round(self::price_set($product), 2);
@@ -761,6 +761,11 @@ class AcrSepetController extends Controller
             $name .= $product->product->name;
             if (count($order->products) - 1 > $key) {
                 $name .= ',';
+            }
+            if ($product->id == 42) { // USB gönderimi varsa
+                $product_type = 0;
+                $cargo        = 1;
+
             }
         }
         //$fiyat_data = $this->lisans_urun_fiyat_hesapla($order->adet, $order->lisans_ay,$order->product_id );
@@ -772,7 +777,7 @@ class AcrSepetController extends Controller
         $shopier->setOrderData($order->id, $price);
         // Sipariş edilen ürünü ekle
 
-        $shopier->setProductData($name, 'dijital');
+        $shopier->setProductData($name, $product_type, $cargo);
         try {
             /**
              * Otomarik ödeme sayfasına yönlendiren renderer

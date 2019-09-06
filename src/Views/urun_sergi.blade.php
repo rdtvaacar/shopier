@@ -29,7 +29,6 @@
                                             <a target="_blank" class="saga_yasla sola_cek" href="https://www.facebook.com/sharer/sharer.php?u={{$web}}/acr/ftr/product/detail?product_id={{$product->id}}"><img width="40"
                                                                                                                                                                                                                 src="/icon/bF.png"></a>
                                             <br><br><br>
-
                                             <a target="_blank" class="saga_yasla sola_cek"
                                                href="http://twitter.com/intent/tweet?text=1.sinifokumayazmaplani.rar&amp;url={{$web}}/acr/ftr/product/detail?product_id={{$product->id}}/&amp;via=oevrak Önlük Baskı">
                                                 <img width="40" src="/icon/bT.png">

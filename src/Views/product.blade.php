@@ -312,7 +312,7 @@
                                 </select>
                                 <hr>
                             @endif
-                           {{-- @if(count($product->product_kols)>0)
+                            {{--@if(count($product->product_kols)>0)
                                 <label>Kol Boyu Seçiniz</label>
                                 <select required class="form-control" name="kol_id">
                                     <option value="">SEÇİNİZ</option>

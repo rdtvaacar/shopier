@@ -567,7 +567,7 @@ class AcrShopierController extends Controller
 
     function my_product(Request $request)
     {
-        $controller  = new AcrFtrController();
+        $controller  = new AcrShopierController();
         $api         = self::my_product_api($request);
         $products    = $api->original['data']['products'];
         $sepet_count = $api->original['data']['sepet_counts'];

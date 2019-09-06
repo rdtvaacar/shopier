@@ -77,7 +77,7 @@
                         @if($product==1282)<span class="text-orange">(Abonelik İşlemleri için zorunludur.)</span>@endif</h3>
                     <div class="btn-info btn-sm" onclick="urun_detay({{$product}})" style="position: absolute; right: 0px; top: -15px; cursor:pointer; ">DETAYLI İNCELE</div>
                     @if($product ==10)
-                        <input id="usb_note" class="form-control" placeholder="Gönderilmesini istediğiniz planın isimini (NOT: Elifin düşleri gönderilemiyor.)">
+                        <input id="usb_note" class="form-control" placeholder="Orinal MEB Etk Planları yada Uyarlanmış MEB Etk Planları ">
                     @endif
                 </div>
                 <div class="urun_detay urun_detay_{{$product}}">
@@ -314,8 +314,15 @@
                         @if($product ==1287) <!-- MEB-->
                         Bilindiği üzere Milli Eğitim Bakanlığı, sınıf içi uygulamalarında öğretmene zengin örnekler sunmak ve doğru olmayan uygulamaların önüne geçilmesi amacıyla etkinlik havuzu hazırlamıştır. Öğretmenlerden Bu etkinlik
                         havuzunu kullanılarak günlük ve aylık planların oluşturması istenmektedir.
-                        Bizde siz değerli öğretmenlerimizin evrak yükünü azaltarak, Milli Eğitim Bakanlığının Okul Öncesine yönelik 54 - 66 Ay gelişim düzeyine uygun hazırladığı etkinliklerden günlük ve aylık planlar oluşturduk,
+                        Bizde siz değerli öğretmenlerimizin evrak yükünü azaltarak, Milli Eğitim Bakanlığının Okul Öncesine yönelik 54 - 69 Ay gelişim düzeyine uygun hazırladığı etkinliklerden günlük ve aylık planlar oluşturduk,
                         interaktif içerikler (videolar, müzikler, hikayeler, slaytlar, sanat etkinlikleri vb) ekleyerek zenginleştirdik.
+                        <br>
+                        Toplamda 2 adet planımız bulunmaktadır.
+                        <ul>
+                            <li>Orjinal MEB etkinlikleriyle oluşturulan plan.</li>
+                            <li>Uyarlanmış MEB etkinlikleriyle oluşturulan plan.</li>
+                        </ul>
+
                         @endif
                         @if($product ==10)
 
@@ -393,11 +400,11 @@
 @stop
 @section('footer')
     <script>
-        function urun_detay (product_id) {
+        function urun_detay(product_id) {
             $('.urun_detay_' + product_id).toggle()
         }
 
-        function sepet (product_id) {
+        function sepet(product_id) {
             if (product_id == 1282) {
                 if ($('#urun_' + product_id).is(':checked') == false) {
                     $('.urun_sec').attr('disabled', 'disabled');
@@ -417,7 +424,7 @@
             fiyat()
         });
 
-        function fiyat () {
+        function fiyat() {
             var product_ids = '';
             $(".urunler :input").each(function () {
                 if ($(this).is(':checked')) {
@@ -455,8 +462,9 @@
             });
         }
 
-        function sepete_ekle () {
+        function sepete_ekle() {
             var usb_note = $('#usb_note').val();
+            var usb = $('#urun_10').prop("checked");
             if ($('#urun_10').is(':checked')) {
                 if (usb_note == '') {
                     alert('Gönderilmesini istediğiniz planı yazmalısınız!');
@@ -464,8 +472,8 @@
                     return 0;
                 }
             }
-            if(usb_note!='') {
-                if(confirm('USB Flash Disk - Plan Gönderimi Ürününü işaretlemediğiniz için planınız adresinize gönderilmeyecektir.')==false) {
+            if (usb_note != '' && usb == false) {
+                if (confirm('USB Flash Disk - Plan Gönderimi Ürününü işaretlemediğiniz için planınız adresinize gönderilmeyecektir.') == false) {
                     return 0;
                 }
             }
@@ -478,7 +486,7 @@
                 }
             });
             if ($('#urun_10').is(':checked')) {
-                if (len< 3) {
+                if (len < 3) {
                     alert('Flash alımlarında en az bir plan aboneliği seçmelisiniz.');
                     return 0;
                 }
@@ -490,7 +498,7 @@
                 url: '/acr/ftr/lisans/urun/sepete/ekle',
                 data: 'product_ids=' + product_ids + '&adet=' + adet + '&ay=' + ay + '&usb_note=' + usb_note,
                 success: function (msg) {
-                    window.location.href = "https://okuloncesievrak.com/acr/ftr/card/adress";
+                    window.location.href = "https://okuloncesievrak.com/acr/ftr/card/sepet";
                 }
             });
         }

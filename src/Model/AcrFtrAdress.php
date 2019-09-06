@@ -21,9 +21,7 @@ class AcrFtrAdress extends Model
             AcrFtrAdress::where('id', $adress_id)->update($data);
             return $adress_id;
         }
-
     }
-
     function city()
     {
         return $this->belongsTo('Acr\Shopier\Model\City', 'city_id', 'id');
@@ -33,11 +31,13 @@ class AcrFtrAdress extends Model
     {
         return $this->belongsTo('Acr\Shopier\Model\County', 'county_id', 'id');
     }
-
+    function counties()
+    {
+        return $this->hasMany('Acr\Shopier\Model\County', 'id', 'city_id');
+    }
     function active_adress($adress_id)
     {
         AcrFtrAdress::where('user_id', Auth::user()->id)->update(['active' => 2]);
         AcrFtrAdress::where('id', $adress_id)->update(['active' => 1]);
     }
-
 }

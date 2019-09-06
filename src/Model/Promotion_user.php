@@ -6,7 +6,6 @@ use Auth;
 use Illuminate\Database\Eloquent\Model;
 
 class Promotion_user extends Model
-
 {
     protected $connection = 'mysql';
     protected $table      = 'promotion_user';
